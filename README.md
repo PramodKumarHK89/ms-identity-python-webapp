@@ -50,36 +50,47 @@ or download and extract the repository .zip file.
 
 > Given that the name of the sample is quite long, you might want to clone it in a folder close to the root of your hard drive, to avoid file name length limitations when running on Windows.
 
-### Step 2:  Register the sample application with your Azure Active Directory tenant
 
-There is one project in this sample. To register it, you can:
+### Step 2: Register the service app
 
-- either follow the steps [Step 2: Register the sample with your Azure Active Directory tenant](#step-2-register-the-sample-with-your-azure-active-directory-tenant) and [Step 3:  Configure the sample to use your Azure AD tenant](#choose-the-azure-ad-tenant-where-you-want-to-create-your-applications)
-- or use PowerShell scripts that:
-  - **automatically** creates the Azure AD applications and related objects (passwords, permissions, dependencies) for you
-  - modify the applications' configuration files.
+1. Navigate to the [Azure portal](https://portal.azure.com) and select the **Azure AD** service.
+1. Select the **App Registrations** blade on the left, then select **New registration**.
+1. In the **Register an application page** that appears, enter your application's registration information:
+   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `ms-identity-javascript-tutorial-c3s1-api`.
+   - Under **Supported account types**, select **Accounts in this organizational directory only**.
+1. Select **Register** to create the application.
+1. In the app's registration screen, find and note the **Application (client) ID**. You use this value in your app's configuration file(s) later in your code.
+1. Select **Save** to save your changes.
+1. In the app's registration screen, select the **Expose an API** blade to the left to open the page where you can declare the parameters to expose this app as an Api for which client applications can obtain [access tokens](https://docs.microsoft.com/azure/active-directory/develop/access-tokens) for.
+The first thing that we need to do is to declare the unique [resource](https://docs.microsoft.com/azure/active-directory/develop/v2-oauth2-auth-code-flow) URI that the clients will be using to obtain access tokens for this Api. To declare an resource URI, follow the following steps:
+   - Click `Set` next to the **Application ID URI** to generate a URI that is unique for this app.
+   - For this sample, accept the proposed Application ID URI (api://{clientId}) by selecting **Save**.
+1. All Apis have to publish a minimum of one [scope](https://docs.microsoft.com/azure/active-directory/develop/v2-oauth2-auth-code-flow#request-an-authorization-code) for the client's to obtain an access token successfully. To publish a scope, follow the following steps:
+   - Select **Add a scope** button open the **Add a scope** screen and Enter the values as indicated below:
+        - For **Scope name**, use `access_as_user`.
+        - Select **Admins and users** options for **Who can consent?**
+        - For **Admin consent display name** type `ms-identity-javascript-c3s1-api`
+        - For **Admin consent description** type `Allows the app to access ms-identity-javascript-tutorial-c3s1-api as the signed-in user.`
+        - For **User consent display name** type `Access ms-identity-javascript-c3s1-api`
+        - For **User consent description** type `Allow the application to access ms-identity-javascript-tutorial-c3s1-api on your behalf.`
+        - Keep **State** as **Enabled**
+        - Click on the **Add scope** button on the bottom to save this scope.
+1. On the right side menu, select the `Manifest` blade.
+   - Set `accessTokenAcceptedVersion` property to **2**.
+   - Click on **Save**.
 
-If you want to use this automation:
+#### Step 3: Configure the service app to use your app registration
 
-1. On Windows, run PowerShell and navigate to the root of the cloned directory
-1. In PowerShell run:
+Open the project in your IDE (like Visual Studio or Visual Studio Code) to configure the code.
 
-   ```PowerShell
-   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force
-   ```
+> In the steps below, "ClientID" is the same as "Application ID" or "AppId".
 
-1. Run the script to create your Azure AD application and configure the code of the sample application accordingly.
-1. In PowerShell run:
+1. Open the `config.json` file under `API` folder.
+1. Find the key `clientID` and replace the existing value with the application ID (clientId) of the `ms-identity-javascript-tutorial-c3s1-api` application copied from the Azure portal.
+1. Find the key `tenantID` and replace the existing value with your Azure AD tenant ID.
+1. Find the key `audience` and replace the existing value with the application ID (clientId) of the `ms-identity-javascript-tutorial-c3s1-api` application copied from the Azure portal.
 
-   ```PowerShell
-   cd .\AppCreationScripts\
-   .\Configure.ps1
-   cd ..
-   ```
-
-   > Other ways of running the scripts are described in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md)
-
-If you don't want to use this automation, follow the steps below.
+### Step 4:  Register the sample(UI) application with your Azure Active Directory tenant
 
 #### Choose the Azure AD tenant where you want to create your applications
 
@@ -95,8 +106,8 @@ As a first step you'll need to:
 1. Select **New registration**.
 1. When the **Register an application page** appears, enter your application's registration information:
    - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `python-webapp`.
-   - Change **Supported account types** to **Accounts in any organizational directory and personal Microsoft accounts (e.g. Skype, Xbox, Outlook.com)**.
-   - In the Redirect URI (optional) section, select **Web** in the combo-box and enter the following redirect URIs: `http://localhost:5000/getAToken`.
+   - Change **Supported account types** to **Accounts in this organizational directory only (pramkumlab only - Single tenant)**.
+   - In the Redirect URI (optional) section, select **Web** in the combo-box and enter the following redirect URIs: `http://localhost:5001/getAToken`.
 1. Select **Register** to create the application.
 1. On the app **Overview** page, find the **Application (client) ID** value and record it for later. You'll need it to configure the Visual Studio configuration file for this project.
 1. Select **Save**.
@@ -113,8 +124,14 @@ As a first step you'll need to:
    - In the *Commonly used Microsoft APIs* section, click on **Microsoft Graph**
    - In the **Delegated permissions** section, ensure that the right permissions are checked: **User.ReadBasic.All**. Use the search box if necessary.
    - Select the **Add permissions** button
+1. In the app's registration screen, click on the **API Permissions** blade in the left to open the page where we add access to the APIs that your application needs.
+    - Click the **Add a permission** button and then,
+    - Ensure that the **My APIs** tab is selected.
+    - In the list of APIs, select the API that you've just registered, i.e. `ms-identity-javascript-tutorial-c3s1-api`.
+    - In the **Delegated permissions** section, select the **access_as_user** in the list. Use the search box if necessary.
+    - Click on the **Add permissions** button at the bottom.
 
-### Step 3:  Configure the sample to use your Azure AD tenant
+### Step 5:  Configure the sample to use your Azure AD tenant
 
 In the steps below, "ClientID" is the same as "Application ID" or "AppId".
 
@@ -123,15 +140,28 @@ In the steps below, "ClientID" is the same as "Application ID" or "AppId".
 > Note: if you used the setup scripts, the changes below may have been applied for you
 
 1. Open the `app_config.py` file
-1. Find the app key `Enter_the_Tenant_Name_Here` and replace the existing value with your Azure AD tenant name.
+1. Find the app key `Enter_the_Tenant_Id_here` and replace the existing value with your Azure AD tenant name.
+1. Find the app key `<API_Client_Id>` and replace the existing value with your API app id.
 1. You saved your application secret during the creation of the `python-webapp` app in the Azure portal.
    Now you can set the secret in environment variable `CLIENT_SECRET`,
    and then adjust `app_config.py` to pick it up.
 1. Find the app key `Enter_the_Application_Id_here` and replace the existing value with the application ID (clientId) of the `python-webapp` application copied from the Azure portal.
 
 
-### Step 4: Run the sample
+### Step 6: Run the sample
 
+## Running the API
+
+```console
+    cd ms-identity-javascript-tutorial
+    cd 3-Authorization-II/1-call-api
+    cd API
+    npm start
+    cd ..
+    cd SPA
+    npm start
+```
+## Running the UI
 - You will need to install dependencies using pip as follows:
 ```Shell
 $ pip install -r requirements.txt
@@ -140,7 +170,7 @@ $ pip install -r requirements.txt
 Run app.py from shell or command line. Note that the host and port values need to match what you've set up in your redirect_uri:
 
 ```Shell
-$ flask run --host localhost --port 5000
+$ flask run --host localhost --port 5001
 ```
 
 ## Community Help and Support
