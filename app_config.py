@@ -10,7 +10,7 @@ CLIENT_SECRET = "Enter_the_Client_Secret_Here" # Placeholder - for use ONLY duri
 # if not CLIENT_SECRET:
 #     raise ValueError("Need to define CLIENT_SECRET environment variable")
 
-AUTHORITY = "https://login.microsoftonline.com/common"  # For multi-tenant app
+AUTHORITY = "https://login.microsoftonline.com/Enter_the_Tenant_Id_here"  # For multi-tenant app
 # AUTHORITY = "https://login.microsoftonline.com/Enter_the_Tenant_Name_Here"
 
 REDIRECT_PATH = "/getAToken"  # Used for forming an absolute URL to your redirect URI.
@@ -20,6 +20,10 @@ REDIRECT_PATH = "/getAToken"  # Used for forming an absolute URL to your redirec
 # You can find more Microsoft Graph API endpoints from Graph Explorer
 # https://developer.microsoft.com/en-us/graph/graph-explorer
 ENDPOINT = 'https://graph.microsoft.com/v1.0/users'  # This resource requires no admin consent
+
+APIENDPOINT = 'http://localhost:5000/api'  # This resource requires no admin consenthttp://localhost:5000/
+
+APISCOPE = ["api://<API_Client_Id>/access_as_user"]
 
 # You can find the proper permission names from this document
 # https://docs.microsoft.com/en-us/graph/permissions-reference

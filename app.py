@@ -4,7 +4,7 @@ from flask import Flask, render_template, session, request, redirect, url_for
 from flask_session import Session  # https://pythonhosted.org/Flask-Session
 import msal
 import app_config
-
+import logging
 
 app = Flask(__name__)
 app.config.from_object(app_config)
@@ -16,6 +16,7 @@ Session(app)
 # See also https://flask.palletsprojects.com/en/1.0.x/deploying/wsgi-standalone/#proxy-setups
 from werkzeug.middleware.proxy_fix import ProxyFix
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+logging.basicConfig(level=logging.DEBUG)
 
 @app.route("/")
 def index():
@@ -62,6 +63,18 @@ def graphcall():
         ).json()
     return render_template('display.html', result=graph_data)
 
+@app.route("/apicall")
+def apicall():
+    token = _get_token_from_cache(app_config.APISCOPE)
+    if not token:
+        session["flow"] = _build_auth_code_flow(scopes=app_config.APISCOPE)
+        return render_template("login.html", auth_url=session["flow"]["auth_uri"], version=msal.__version__)
+    logging.debug(token['access_token'])
+    graph_data = requests.get(  # Use token to call downstream service
+        app_config.APIENDPOINT,
+        headers={'Authorization': 'Bearer ' + token['access_token']},
+        ).json()
+    return render_template('apidisplay.html', result=graph_data)
 
 def _load_cache():
     cache = msal.SerializableTokenCache()

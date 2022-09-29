@@ -105,3 +105,4 @@ venv.bak/
 
 # flask session files
 flask_session/
+API/node_modules/
